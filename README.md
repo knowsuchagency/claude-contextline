@@ -18,17 +18,6 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 }
 ```
 
-Or with bunx:
-
-```json
-{
-  "statusLine": {
-    "type": "command",
-    "command": "bunx claude-contextline"
-  }
-}
-```
-
 ## Features
 
 - **Directory** - Shows current project/directory name
