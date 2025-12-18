@@ -1,0 +1,20 @@
+# Source files (only dist is published)
+src/
+tsconfig.json
+vitest.config.ts
+
+# Development files
+.gitignore
+.github/
+coverage/
+.nyc_output/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
