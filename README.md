@@ -5,19 +5,7 @@ A powerline-style statusline for Claude Code showing context window usage.
 <img width="677" height="38" alt="image" src="https://github.com/user-attachments/assets/070d99fe-290d-4897-88b0-04247bf27866" />
 
 
-## Installation
-
-```bash
-npm install -g claude-contextline
-```
-
-Or use with npx:
-
-```bash
-npx claude-contextline
-```
-
-## Configuration
+## Usage
 
 Add to your Claude Code settings (`~/.claude/settings.json`):
 
@@ -25,18 +13,18 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 {
   "statusLine": {
     "type": "command",
-    "command": "claude-contextline"
+    "command": "npx claude-contextline"
   }
 }
 ```
 
-Or with npx:
+Or with bunx:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "npx claude-contextline"
+    "command": "bunx claude-contextline"
   }
 }
 ```
