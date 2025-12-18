@@ -2,6 +2,9 @@
 
 A powerline-style statusline for Claude Code showing context window usage.
 
+<img width="677" height="38" alt="image" src="https://github.com/user-attachments/assets/070d99fe-290d-4897-88b0-04247bf27866" />
+
+
 ## Installation
 
 ```bash
