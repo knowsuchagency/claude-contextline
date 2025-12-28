@@ -1,12 +1,34 @@
 import type { EnvironmentInfo, Segment } from "./types.js";
-import { SYMBOLS } from "./utils/constants.js";
+import { SYMBOLS, TEXT_SYMBOLS } from "./utils/constants.js";
 import { darkTheme, ansi, getContextColors } from "./themes/index.js";
+
+/**
+ * Detect if the terminal likely supports Nerd Font symbols
+ */
+function detectNerdFontSupport(): boolean {
+  // Allow explicit override
+  if (process.env.NERD_FONTS === "1") return true;
+  if (process.env.NERD_FONTS === "0") return false;
+
+  // Check for terminals commonly configured with Nerd Fonts
+  const termProgram = process.env.TERM_PROGRAM?.toLowerCase() ?? "";
+  const nerdFontTerminals = [
+    "warp",
+    "iterm",
+    "hyper",
+    "kitty",
+    "alacritty",
+    "ghostty",
+  ];
+
+  return nerdFontTerminals.some((t) => termProgram.includes(t));
+}
 
 /**
  * Renderer for powerline-style statusline
  */
 export class Renderer {
-  private symbols = SYMBOLS;
+  private symbols = detectNerdFontSupport() ? SYMBOLS : TEXT_SYMBOLS;
 
   /**
    * Render the complete statusline
