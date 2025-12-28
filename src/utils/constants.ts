@@ -13,10 +13,10 @@ export const SYMBOLS = {
  * Text fallback symbols for terminals without nerd fonts
  */
 export const TEXT_SYMBOLS = {
-  arrow: ">",
+  arrow: "",
   branch: "",
-  model: "*",
-  context: "CTX",
+  model: "",
+  context: "",
   dirty: "*",
 };
 
