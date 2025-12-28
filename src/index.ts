@@ -13,6 +13,8 @@ import { Renderer } from "./renderer.js";
  */
 async function main(): Promise<void> {
   try {
+    const noArrows = process.argv.includes("--no-arrows");
+
     // Read hook data from stdin (with timeout)
     const hookData = await readHookData();
 
@@ -20,7 +22,7 @@ async function main(): Promise<void> {
     const envInfo = getEnvironmentInfo(hookData);
 
     // Render and output the statusline
-    const renderer = new Renderer();
+    const renderer = new Renderer({ noArrows });
     const output = renderer.render(envInfo);
 
     process.stdout.write(output);

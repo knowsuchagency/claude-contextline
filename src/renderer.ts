@@ -24,11 +24,20 @@ function detectNerdFontSupport(): boolean {
   return nerdFontTerminals.some((t) => termProgram.includes(t));
 }
 
+interface RendererOptions {
+  noArrows?: boolean;
+}
+
 /**
  * Renderer for powerline-style statusline
  */
 export class Renderer {
   private symbols = detectNerdFontSupport() ? SYMBOLS : TEXT_SYMBOLS;
+  private noArrows: boolean;
+
+  constructor(options: RendererOptions = {}) {
+    this.noArrows = options.noArrows ?? false;
+  }
 
   /**
    * Render the complete statusline
@@ -95,7 +104,9 @@ export class Renderer {
 
       // Powerline arrow
       output += ansi.reset;
-      if (nextColors) {
+      if (this.noArrows) {
+        // Skip arrows entirely
+      } else if (nextColors) {
         // Arrow: current bg as fg, next bg as bg
         output += ansi.fg(seg.colors.bg) + ansi.bg(nextColors.bg) + this.symbols.arrow;
       } else {
