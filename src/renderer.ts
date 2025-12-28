@@ -1,12 +1,12 @@
 import type { EnvironmentInfo, Segment } from "./types.js";
-import { SYMBOLS } from "./utils/constants.js";
+import { TEXT_SYMBOLS } from "./utils/constants.js";
 import { darkTheme, ansi, getContextColors } from "./themes/index.js";
 
 /**
  * Renderer for powerline-style statusline
  */
 export class Renderer {
-  private symbols = SYMBOLS;
+  private symbols = TEXT_SYMBOLS;
 
   /**
    * Render the complete statusline
