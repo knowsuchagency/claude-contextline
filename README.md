@@ -30,12 +30,6 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 
 - Node.js 18+
 
-## Credits
-
-Inspired by [claude-limitline](https://github.com/tylergraydev/claude-limitline), which now supports context thanks to [this PR 😉](https://github.com/tylergraydev/claude-limitline/pull/10).
-
-This is still useful for those who want ONLY the context limit and track usage elsewhere i.e. within [Vibora](https://github.com/knowsuchagency/vibora?tab=readme-ov-file#system-monitoring).
-
 ## License
 
 MIT
