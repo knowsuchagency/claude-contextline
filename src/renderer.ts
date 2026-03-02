@@ -1,121 +1,62 @@
-import type { EnvironmentInfo, Segment } from "./types.js";
-import { SYMBOLS, TEXT_SYMBOLS } from "./utils/constants.js";
-import { darkTheme, ansi, getContextColors } from "./themes/index.js";
+import type { EnvironmentInfo } from "./types.js";
+
+/** ANSI 256 color escape sequences */
+const ESC = "\x1b";
+const RESET = `${ESC}[0m`;
+const BLUE = `${ESC}[38;5;69m`;
+const RED = `${ESC}[38;5;196m`;
+const GRAY = `${ESC}[38;5;243m`;
+
+const BAR_WIDTH = 10;
+const FILLED_CHAR = "\u2588"; // █
+const EMPTY_CHAR = "\u2591"; // ░
 
 /**
- * Detect if the terminal likely supports Nerd Font symbols
+ * Render the two-line statusline
  */
-function detectNerdFontSupport(): boolean {
-  // Allow explicit override
-  if (process.env.NERD_FONTS === "1") return true;
-  if (process.env.NERD_FONTS === "0") return false;
+export function render(envInfo: EnvironmentInfo): string {
+  let out = "";
+  let modelCol = 0;
 
-  // Check for terminals commonly configured with Nerd Fonts
-  const termProgram = process.env.TERM_PROGRAM?.toLowerCase() ?? "";
-  const nerdFontTerminals = [
-    "warp",
-    "iterm",
-    "hyper",
-    "kitty",
-    "alacritty",
-    "ghostty",
-  ];
+  // Line 1: battery bar + model
+  if (envInfo.usedPercentage != null) {
+    const pct = Math.max(0, envInfo.usedPercentage);
+    const pctStr = String(pct);
+    const nFilled = Math.min(
+      Math.floor((pct * BAR_WIDTH) / 100),
+      BAR_WIDTH,
+    );
+    const nEmpty = BAR_WIDTH - nFilled;
 
-  return nerdFontTerminals.some((t) => termProgram.includes(t));
-}
+    const filled = FILLED_CHAR.repeat(nFilled);
+    const empty = EMPTY_CHAR.repeat(nEmpty);
 
-interface RendererOptions {
-  noArrows?: boolean;
-}
+    out += `${BLUE}[${filled}${GRAY}${empty}${BLUE}] ${pctStr}%`;
 
-/**
- * Renderer for powerline-style statusline
- */
-export class Renderer {
-  private symbols = detectNerdFontSupport() ? SYMBOLS : TEXT_SYMBOLS;
-  private noArrows: boolean;
-
-  constructor(options: RendererOptions = {}) {
-    this.noArrows = options.noArrows ?? false;
+    // model_col = 1([) + 10(bar) + 2(] ) + pct_digits + 1(%) + 2(  ) = 16 + pct_digits
+    modelCol = 16 + pctStr.length;
   }
 
-  /**
-   * Render the complete statusline
-   */
-  render(envInfo: EnvironmentInfo): string {
-    const segments = this.buildSegments(envInfo);
+  // Model (red), same line
+  if (out.length > 0) {
+    out += "  ";
+  }
+  out += `${RED}${envInfo.model}`;
 
-    if (segments.length === 0) {
-      return "";
-    }
+  // Line 2: branch (left) + dir_tail (aligned to model column)
+  out += "\n";
 
-    return this.renderPowerline(segments);
+  if (envInfo.gitBranch) {
+    const branchText = `(${envInfo.gitBranch})`;
+    out += `${RED}${branchText}`;
+    const gap = Math.max(2, modelCol - branchText.length);
+    out += " ".repeat(gap);
+  } else {
+    out += " ".repeat(modelCol);
   }
 
-  /**
-   * Build segments based on environment info
-   */
-  private buildSegments(envInfo: EnvironmentInfo): Segment[] {
-    const segments: Segment[] = [];
+  out += `${BLUE}${envInfo.directory}`;
+  out += RESET;
 
-    // Directory segment
-    segments.push({
-      text: ` ${envInfo.directory} `,
-      colors: darkTheme.directory,
-    });
-
-    // Git segment (only if in a git repo)
-    if (envInfo.gitBranch) {
-      const dirty = envInfo.gitDirty ? ` ${this.symbols.dirty}` : "";
-      segments.push({
-        text: ` ${this.symbols.branch} ${envInfo.gitBranch}${dirty} `,
-        colors: darkTheme.git,
-      });
-    }
-
-    // Model segment
-    segments.push({
-      text: ` ${this.symbols.model} ${envInfo.model} `,
-      colors: darkTheme.model,
-    });
-
-    // Context segment
-    const contextColors = getContextColors(envInfo.contextPercent);
-    segments.push({
-      text: ` ${this.symbols.context} ${envInfo.contextPercent}% `,
-      colors: contextColors,
-    });
-
-    return segments;
-  }
-
-  /**
-   * Render segments with powerline arrows
-   */
-  private renderPowerline(segments: Segment[]): string {
-    let output = "";
-
-    for (let i = 0; i < segments.length; i++) {
-      const seg = segments[i];
-      const nextColors = i < segments.length - 1 ? segments[i + 1].colors : null;
-
-      // Segment content with background and foreground colors
-      output += ansi.bg(seg.colors.bg) + ansi.fg(seg.colors.fg) + seg.text;
-
-      // Powerline arrow
-      output += ansi.reset;
-      if (this.noArrows) {
-        // Skip arrows entirely
-      } else if (nextColors) {
-        // Arrow: current bg as fg, next bg as bg
-        output += ansi.fg(seg.colors.bg) + ansi.bg(nextColors.bg) + this.symbols.arrow;
-      } else {
-        // Final arrow: current bg as fg, no background
-        output += ansi.fg(seg.colors.bg) + this.symbols.arrow;
-      }
-    }
-
-    output += ansi.reset;
-    return output;
-  }
+  return out;
 }

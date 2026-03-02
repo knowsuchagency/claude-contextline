@@ -11,9 +11,8 @@ export function getEnvironmentInfo(hookData: ClaudeHookData): EnvironmentInfo {
   return {
     directory: getDirectoryName(cwd),
     gitBranch: getGitBranch(cwd),
-    gitDirty: isGitDirty(cwd),
     model: getModelName(hookData),
-    contextPercent: getContextPercent(hookData),
+    usedPercentage: getUsedPercentage(hookData),
   };
 }
 
@@ -34,36 +33,16 @@ function getGitBranch(cwd: string): string | null {
       cwd,
       encoding: "utf8",
       stdio: ["pipe", "pipe", "pipe"],
+      env: { ...process.env, GIT_OPTIONAL_LOCKS: "0" },
     }).trim();
 
-    // If detached HEAD, get short commit hash
     if (branch === "HEAD") {
-      return execSync("git rev-parse --short HEAD", {
-        cwd,
-        encoding: "utf8",
-        stdio: ["pipe", "pipe", "pipe"],
-      }).trim();
+      return null;
     }
 
     return branch;
   } catch {
     return null;
-  }
-}
-
-/**
- * Check if git working directory has uncommitted changes
- */
-function isGitDirty(cwd: string): boolean {
-  try {
-    const status = execSync("git status --porcelain", {
-      cwd,
-      encoding: "utf8",
-      stdio: ["pipe", "pipe", "pipe"],
-    });
-    return status.trim().length > 0;
-  } catch {
-    return false;
   }
 }
 
@@ -77,19 +56,26 @@ function getModelName(hookData: ClaudeHookData): string {
 }
 
 /**
- * Calculate context window usage percentage
+ * Get context window usage percentage
  */
-function getContextPercent(hookData: ClaudeHookData): number {
+function getUsedPercentage(hookData: ClaudeHookData): number | null {
   const ctx = hookData.context_window;
-  if (!ctx?.current_usage || !ctx.context_window_size) {
-    return 0;
+  if (!ctx) return null;
+
+  // Prefer direct used_percentage from JSON
+  if (ctx.used_percentage != null) {
+    return Math.floor(ctx.used_percentage);
   }
 
-  const usage = ctx.current_usage;
-  const totalTokens =
-    (usage.input_tokens || 0) +
-    (usage.cache_creation_input_tokens || 0) +
-    (usage.cache_read_input_tokens || 0);
+  // Fallback: compute from tokens
+  if (ctx.current_usage && ctx.context_window_size) {
+    const usage = ctx.current_usage;
+    const totalTokens =
+      (usage.input_tokens || 0) +
+      (usage.cache_creation_input_tokens || 0) +
+      (usage.cache_read_input_tokens || 0);
+    return Math.floor((totalTokens / ctx.context_window_size) * 100);
+  }
 
-  return Math.round((totalTokens / ctx.context_window_size) * 100);
+  return null;
 }
