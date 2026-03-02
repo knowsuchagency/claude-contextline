@@ -14,12 +14,13 @@ export interface ClaudeHookData {
     project_dir?: string;
   };
   context_window?: {
-    current_usage: {
+    used_percentage?: number;
+    current_usage?: {
       input_tokens: number;
       cache_creation_input_tokens: number;
       cache_read_input_tokens: number;
     };
-    context_window_size: number;
+    context_window_size?: number;
   };
 }
 
@@ -29,23 +30,6 @@ export interface ClaudeHookData {
 export interface EnvironmentInfo {
   directory: string;
   gitBranch: string | null;
-  gitDirty: boolean;
   model: string;
-  contextPercent: number;
-}
-
-/**
- * A segment to render in the statusline
- */
-export interface Segment {
-  text: string;
-  colors: SegmentColor;
-}
-
-/**
- * Color definition for a segment
- */
-export interface SegmentColor {
-  bg: string;
-  fg: string;
+  usedPercentage: number | null;
 }

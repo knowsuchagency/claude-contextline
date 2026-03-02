@@ -1,7 +1,7 @@
 {
   "name": "claude-contextline",
-  "version": "1.2.0",
-  "description": "Powerline statusline for Claude Code showing context window usage",
+  "version": "2.0.0",
+  "description": "Two-line statusline for Claude Code showing context window usage",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -25,7 +25,6 @@
     "claude",
     "claude-code",
     "statusline",
-    "powerline",
     "context-window",
     "cli"
   ],
