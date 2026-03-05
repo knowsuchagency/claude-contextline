@@ -1,0 +1,8 @@
+[tasks.build]
+description = "Build the project with tsup"
+run = "bun run build"
+
+[tasks.publish]
+description = "Build and publish to npm"
+depends = ["build"]
+run = "npm publish"
