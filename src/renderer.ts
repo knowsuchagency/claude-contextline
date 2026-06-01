@@ -1,11 +1,7 @@
 import type { EnvironmentInfo } from "./types.js";
+import { loadHerdrTheme } from "./theme.js";
 
-/** ANSI 256 color escape sequences */
-const ESC = "\x1b";
-const RESET = `${ESC}[0m`;
-const BLUE = `${ESC}[38;5;69m`;
-const RED = `${ESC}[38;5;196m`;
-const GRAY = `${ESC}[38;5;243m`;
+const RESET = "\x1b[0m";
 
 const BAR_WIDTH = 10;
 const FILLED_CHAR = "\u2588"; // █
@@ -15,6 +11,9 @@ const EMPTY_CHAR = "\u2591"; // ░
  * Render the two-line statusline
  */
 export function render(envInfo: EnvironmentInfo): string {
+  // Colors track the active herdr theme, re-read on every render.
+  const { blue: BLUE, red: RED, mauve: MAUVE, overlay0: GRAY } = loadHerdrTheme();
+
   let out = "";
   let modelCol = 0;
 
@@ -48,7 +47,7 @@ export function render(envInfo: EnvironmentInfo): string {
 
   if (envInfo.gitBranch) {
     const branchText = `(${envInfo.gitBranch})`;
-    out += `${RED}${branchText}`;
+    out += `${MAUVE}${branchText}`;
     const gap = Math.max(2, modelCol - branchText.length);
     out += " ".repeat(gap);
   } else {
