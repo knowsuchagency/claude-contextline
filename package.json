@@ -1,6 +1,6 @@
 {
   "name": "claude-contextline",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Two-line statusline for Claude Code showing context window usage",
   "type": "module",
   "main": "dist/index.js",

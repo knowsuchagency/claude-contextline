@@ -23,15 +23,12 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 (main)            myproject
 ```
 
-Colors track your active [herdr](https://github.com/) theme, read from
-`~/.config/herdr/config.toml` (respects `$XDG_CONFIG_HOME` and
-`$HERDR_CONFIG_PATH`) on every render — including `[theme.custom]` overrides.
-All of herdr's built-in themes are supported (catppuccin, tokyo-night, dracula,
-nord, gruvbox, solarized, kanagawa, rosé-pine, vesper, …); if no config is found
-it falls back to Catppuccin Mocha.
+Colors reflect [lasso](https://github.com/)'s Onyx design system — lasso's
+single, fixed (dark) palette — so the statusline stays in step with lasso's
+indigo-forward look. The tokens mirror lasso's canonical Onyx colors.
 
-- **Line 1**: Context window battery bar (blue) with usage percentage, model name (red)
-- **Line 2**: Git branch (mauve), working directory (blue) aligned below the model
+- **Line 1**: Context window battery bar (Onyx accent) with usage percentage, model name (Onyx danger)
+- **Line 2**: Git branch (Onyx secondary indigo), working directory (Onyx accent) aligned below the model
 
 ## Requirements
 
