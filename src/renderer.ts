@@ -1,5 +1,5 @@
 import type { EnvironmentInfo } from "./types.js";
-import { loadHerdrTheme } from "./theme.js";
+import { loadLassoTheme } from "./theme.js";
 
 const RESET = "\x1b[0m";
 
@@ -11,8 +11,8 @@ const EMPTY_CHAR = "\u2591"; // ░
  * Render the two-line statusline
  */
 export function render(envInfo: EnvironmentInfo): string {
-  // Colors track the active herdr theme, re-read on every render.
-  const { blue: BLUE, red: RED, mauve: MAUVE, overlay0: GRAY } = loadHerdrTheme();
+  // Colors track lasso's active (Onyx) theme.
+  const { blue: BLUE, red: RED, mauve: MAUVE, overlay0: GRAY } = loadLassoTheme();
 
   let out = "";
   let modelCol = 0;
