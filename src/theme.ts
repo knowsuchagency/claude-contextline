@@ -3,34 +3,35 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 /**
- * Resolves the statusline colors from lasso's Onyx design system, tracking
+ * Resolves the statusline colors from lasso's Nothing design system, tracking
  * lasso's live light/dark appearance.
  *
- * lasso (the successor to herdr) replaced herdr's theme switcher with a single
- * design system — "Onyx" — that has a dark and a light mode. The active
- * appearance is mirrored to disk by lasso at `~/.lasso/settings.json` under the
- * `theme` key (written on every UI appearance change; see lasso's
+ * lasso mirrors its active appearance to disk at `~/.lasso/settings.json` under
+ * the `theme` key (written on every UI appearance change; see lasso's
  * `web/src/lib/mode.ts` + `/api/theme`), so we can read it without a browser.
- * We re-read that file on every render and pick the matching Onyx palette.
+ * We re-read that file on every render and pick the matching Nothing palette.
  *
- * The palettes mirror lasso's canonical Onyx tokens — dark from
- * `web/src/index.css` `--color-onyx-*` / `ONYX_XTERM_DARK`, light from the
- * `:root.light` `--h-*` overrides / `ONYX_XTERM_LIGHT`.
+ * The palettes mirror lasso's canonical Nothing tokens (`web/src/index.css`
+ * `--h-*` seam + `ONYX_XTERM_*`): a monochrome canvas where brightness — not
+ * hue — is the hierarchy, and the one true signal colour (red `#d71921`) is an
+ * interrupt, used here only when the context window is nearly full.
  */
 
-/** The four tokens the statusline renders, as ready-to-use foreground escapes. */
+/** The colour tokens the statusline renders, as ready-to-use foreground escapes. */
 export interface ThemeColors {
-  /** Battery bar (filled) + directory. */
-  blue: string;
-  /** Model name. */
-  red: string;
-  /** Git branch. */
-  mauve: string;
-  /** Empty battery cells (muted). */
-  overlay0: string;
+  /** Battery bar (filled), brackets + percentage — the value, brightest. */
+  bar: string;
+  /** Same as `bar`, but when context is ≥90% full: the Nothing red interrupt. */
+  barFull: string;
+  /** Model name + directory — primary foreground. */
+  text: string;
+  /** Git branch — secondary metadata. */
+  branch: string;
+  /** Empty battery cells — dim seam. */
+  empty: string;
 }
 
-/** Build a 24-bit RGB foreground escape from a `#rrggbb` Onyx token. */
+/** Build a 24-bit RGB foreground escape from a `#rrggbb` token. */
 function fg(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -39,22 +40,26 @@ function fg(hex: string): string {
 }
 
 /**
- * The Onyx palettes, mapped onto the four statusline tokens. The names are kept
- * (blue/red/mauve/overlay0) so the renderer's call sites read unchanged; the
- * values are Onyx's indigo-forward accents plus its danger and muted tokens.
+ * The Nothing palettes. Dark is the "instrument panel in a dark room" — white
+ * data on OLED black; light is the "printed technical manual" — black ink on
+ * warm off-white. The bar and primary text read bright, the branch recedes to
+ * a muted grey, and the empty bar cells sit at a dim seam. Colour appears only
+ * as data status: the bar flips to red once the context window is ≥90% full.
  */
-const ONYX: Record<"dark" | "light", ThemeColors> = {
+const NOTHING: Record<"dark" | "light", ThemeColors> = {
   dark: {
-    blue: fg("#7b7fff"), // --color-onyx-accent   (filled bar + directory)
-    red: fg("#f2545b"), // --color-onyx-danger   (model name)
-    mauve: fg("#9498ff"), // --color-onyx-accent-1 (git branch)
-    overlay0: fg("#3b3f4e"), // --color-onyx-fg-3     (empty bar cells, muted)
+    bar: fg("#ededed"), // --h-fg        (filled bar + percentage)
+    barFull: fg("#d71921"), // --h-bad    (context ≥90% — interrupt)
+    text: fg("#ededed"), // --h-fg        (model + directory)
+    branch: fg("#8a8a8a"), // --h-muted   (git branch)
+    empty: fg("#3a3a3a"), // --h-border+  (empty bar cells)
   },
   light: {
-    blue: fg("#5c61e6"), // --h-accent (light primary, deeper indigo)
-    red: fg("#d63d44"), // --h-bad    (darkened danger for light bg)
-    mauve: fg("#7b7fff"), // Onyx's lighter indigo, kept distinct from the directory
-    overlay0: fg("#6b7080"), // --h-muted (--fg-2)
+    bar: fg("#1a1a1a"), // --h-fg (light)
+    barFull: fg("#c0141b"), // --h-bad (light, darkened)
+    text: fg("#1a1a1a"), // --h-fg (light)
+    branch: fg("#666666"), // --h-muted (light)
+    empty: fg("#cccccc"), // light seam
   },
 };
 
@@ -67,7 +72,7 @@ function settingsPath(): string {
 /**
  * Read lasso's resolved appearance from `~/.lasso/settings.json`. Returns
  * "dark" if the file is missing, unreadable, malformed, or names anything other
- * than "light" — Onyx is dark-forward, so dark is the safe default.
+ * than "light" — the Nothing canvas is dark-forward, so dark is the safe default.
  */
 function resolvedAppearance(): "dark" | "light" {
   try {
@@ -80,8 +85,8 @@ function resolvedAppearance(): "dark" | "light" {
 
 /**
  * Load lasso's active theme as ready-to-use ANSI escapes, tracking its live
- * light/dark appearance. Never throws — falls back to the Onyx dark palette.
+ * light/dark appearance. Never throws — falls back to the Nothing dark palette.
  */
 export function loadLassoTheme(): ThemeColors {
-  return ONYX[resolvedAppearance()];
+  return NOTHING[resolvedAppearance()];
 }
