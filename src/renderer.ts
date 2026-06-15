@@ -1,5 +1,5 @@
 import type { EnvironmentInfo } from "./types.js";
-import { loadLassoTheme } from "./theme.js";
+import { loadTheme } from "./theme.js";
 
 const RESET = "\x1b[0m";
 
@@ -11,9 +11,9 @@ const EMPTY_CHAR = "\u2591"; // ░
  * Render the two-line statusline
  */
 export function render(envInfo: EnvironmentInfo): string {
-  // Colors track lasso's active (Nothing) theme.
+  // Colors track the resolved (Nothing) theme: Claude Code, then lasso, then system.
   const { bar: BAR, barFull: BAR_FULL, text: TEXT, branch: BRANCH, empty: EMPTY } =
-    loadLassoTheme();
+    loadTheme();
 
   let out = "";
   let modelCol = 0;
