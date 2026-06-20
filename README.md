@@ -23,12 +23,14 @@ Add to your Claude Code settings (`~/.claude/settings.json`):
 (main)            myproject
 ```
 
-Colors reflect [lasso](https://github.com/)'s Onyx design system — lasso's
-single, fixed (dark) palette — so the statusline stays in step with lasso's
-indigo-forward look. The tokens mirror lasso's canonical Onyx colors.
+Colors track the active [herdr](https://github.com/) theme, re-read from
+`~/.config/herdr/config.toml` on every render, so the statusline stays in step
+with whatever theme herdr is currently using. All of herdr's built-in palettes
+are supported, along with `[theme.custom]` per-token overrides; it falls back to
+Catppuccin Mocha when no herdr config is found.
 
-- **Line 1**: Context window battery bar (Onyx accent) with usage percentage, model name (Onyx danger)
-- **Line 2**: Git branch (Onyx secondary indigo), working directory (Onyx accent) aligned below the model
+- **Line 1**: Context window battery bar (accent) with usage percentage, model name
+- **Line 2**: Git branch, working directory (accent) aligned below the model
 
 ## Requirements
 

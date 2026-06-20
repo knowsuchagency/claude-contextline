@@ -1,5 +1,5 @@
 import type { EnvironmentInfo } from "./types.js";
-import { loadLassoTheme } from "./theme.js";
+import { loadHerdrTheme } from "./theme.js";
 
 const RESET = "\x1b[0m";
 
@@ -11,9 +11,8 @@ const EMPTY_CHAR = "\u2591"; // ░
  * Render the two-line statusline
  */
 export function render(envInfo: EnvironmentInfo): string {
-  // Colors track lasso's active (Nothing) theme.
-  const { bar: BAR, barFull: BAR_FULL, text: TEXT, branch: BRANCH, empty: EMPTY } =
-    loadLassoTheme();
+  // Colors track the active herdr theme, re-read on every render.
+  const { blue: BLUE, red: RED, mauve: MAUVE, overlay0: GRAY } = loadHerdrTheme();
 
   let out = "";
   let modelCol = 0;
@@ -31,35 +30,31 @@ export function render(envInfo: EnvironmentInfo): string {
     const filled = FILLED_CHAR.repeat(nFilled);
     const empty = EMPTY_CHAR.repeat(nEmpty);
 
-    // Nothing data-status: the value is monochrome until the context window is
-    // nearly full, then it flips to the red interrupt.
-    const fill = pct >= 90 ? BAR_FULL : BAR;
-
-    out += `${fill}[${filled}${EMPTY}${empty}${fill}] ${pctStr}%`;
+    out += `${BLUE}[${filled}${GRAY}${empty}${BLUE}] ${pctStr}%`;
 
     // model_col = 1([) + 10(bar) + 2(] ) + pct_digits + 1(%) + 2(  ) = 16 + pct_digits
     modelCol = 16 + pctStr.length;
   }
 
-  // Model (primary text), same line
+  // Model (red), same line
   if (out.length > 0) {
     out += "  ";
   }
-  out += `${TEXT}${envInfo.model}`;
+  out += `${RED}${envInfo.model}`;
 
   // Line 2: branch (left) + dir_tail (aligned to model column)
   out += "\n";
 
   if (envInfo.gitBranch) {
     const branchText = `(${envInfo.gitBranch})`;
-    out += `${BRANCH}${branchText}`;
+    out += `${MAUVE}${branchText}`;
     const gap = Math.max(2, modelCol - branchText.length);
     out += " ".repeat(gap);
   } else {
     out += " ".repeat(modelCol);
   }
 
-  out += `${TEXT}${envInfo.directory}`;
+  out += `${BLUE}${envInfo.directory}`;
   out += RESET;
 
   return out;
