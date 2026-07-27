@@ -13,6 +13,7 @@ describe("render", () => {
       gitBranch: "main",
       model: "Opus 4.6",
       usedPercentage: 42,
+      email: null,
     };
     const output = render(info);
     const lines = output.split("\n");
@@ -35,6 +36,7 @@ describe("render", () => {
       gitBranch: null,
       model: "Opus 4.6",
       usedPercentage: 50,
+      email: null,
     };
     const output = render(info);
     const lines = output.split("\n");
@@ -49,6 +51,7 @@ describe("render", () => {
       gitBranch: "main",
       model: "Opus 4.6",
       usedPercentage: null,
+      email: null,
     };
     const output = render(info);
     const lines = output.split("\n");
@@ -63,6 +66,7 @@ describe("render", () => {
       gitBranch: null,
       model: "Opus 4.6",
       usedPercentage: 120,
+      email: null,
     };
     const output = render(info);
     const stripped = stripAnsi(output.split("\n")[0]);
@@ -76,6 +80,7 @@ describe("render", () => {
       gitBranch: null,
       model: "Sonnet 4",
       usedPercentage: 0,
+      email: null,
     };
     const output = render(info);
     const stripped = stripAnsi(output.split("\n")[0]);
@@ -88,6 +93,7 @@ describe("render", () => {
       gitBranch: "main",
       model: "Opus 4.6",
       usedPercentage: 42,
+      email: null,
     };
     const output = render(info);
     const lines = output.split("\n");
@@ -106,6 +112,7 @@ describe("render", () => {
       gitBranch: "feature/very-long-branch-name",
       model: "Opus 4.6",
       usedPercentage: 5,
+      email: null,
     };
     const output = render(info);
     const lines = output.split("\n");
@@ -116,5 +123,48 @@ describe("render", () => {
     const branchEnd = stripped2.indexOf(")") + 1;
     const dirStart = stripped2.indexOf("proj");
     expect(dirStart - branchEnd).toBe(2);
+  });
+
+  it("renders the signed-in email after the model", () => {
+    const info: EnvironmentInfo = {
+      directory: "myproject",
+      gitBranch: "main",
+      model: "Opus 4.6",
+      usedPercentage: 42,
+      email: "dev@example.com",
+    };
+    const output = render(info);
+    const stripped1 = stripAnsi(output.split("\n")[0]);
+
+    expect(stripped1).toContain("Opus 4.6  dev@example.com");
+  });
+
+  it("omits the email when there is no signed-in account", () => {
+    const info: EnvironmentInfo = {
+      directory: "myproject",
+      gitBranch: "main",
+      model: "Opus 4.6",
+      usedPercentage: 42,
+      email: null,
+    };
+    const stripped1 = stripAnsi(render(info).split("\n")[0]);
+
+    expect(stripped1).not.toContain("@");
+    expect(stripped1.trimEnd()).toMatch(/Opus 4\.6$/);
+  });
+
+  it("keeps dir_tail aligned below the model when an email is shown", () => {
+    const info: EnvironmentInfo = {
+      directory: "myproject",
+      gitBranch: "main",
+      model: "Opus 4.6",
+      usedPercentage: 42,
+      email: "dev@example.com",
+    };
+    const lines = render(info).split("\n");
+
+    const modelStart = stripAnsi(lines[0]).indexOf("Opus 4.6");
+    const dirStart = stripAnsi(lines[1]).indexOf("myproject");
+    expect(modelStart).toBe(dirStart);
   });
 });

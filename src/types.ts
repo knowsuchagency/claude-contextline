@@ -32,4 +32,5 @@ export interface EnvironmentInfo {
   gitBranch: string | null;
   model: string;
   usedPercentage: number | null;
+  email: string | null;
 }

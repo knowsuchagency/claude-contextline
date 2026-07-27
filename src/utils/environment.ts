@@ -1,6 +1,7 @@
 import { execSync } from "node:child_process";
 import { basename } from "node:path";
 import type { ClaudeHookData, EnvironmentInfo } from "../types.js";
+import { getUserEmail } from "./account.js";
 
 /**
  * Extract environment information from hook data and system
@@ -13,6 +14,7 @@ export function getEnvironmentInfo(hookData: ClaudeHookData): EnvironmentInfo {
     gitBranch: getGitBranch(cwd),
     model: getModelName(hookData),
     usedPercentage: getUsedPercentage(hookData),
+    email: getUserEmail(),
   };
 }
 

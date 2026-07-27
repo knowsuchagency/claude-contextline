@@ -42,6 +42,12 @@ export function render(envInfo: EnvironmentInfo): string {
   }
   out += `${RED}${envInfo.model}`;
 
+  // Signed-in account (muted), trailing the model so the line-2 alignment below
+  // is unaffected.
+  if (envInfo.email) {
+    out += `  ${GRAY}${envInfo.email}`;
+  }
+
   // Line 2: branch (left) + dir_tail (aligned to model column)
   out += "\n";
 
